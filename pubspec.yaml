@@ -1,0 +1,30 @@
+name: my_home_library
+description: A personal library management application.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.4.9
+  sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  http: ^1.1.0
+  cupertino_icons: ^1.0.6
+  shared_preferences: ^2.2.2
+  mobile_scanner: ^5.2.3
+  permission_handler: ^11.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
