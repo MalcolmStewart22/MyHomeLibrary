@@ -243,19 +243,23 @@ class _LibraryFilterModalState extends ConsumerState<LibraryFilterModal> {
   Widget _buildSortOptions(LibraryFilter filter) {
     return Column(
       children: [
-        ...SortOption.values.map((option) {
-          return RadioListTile<SortOption>(
-            title: Text(_getSortOptionLabel(option)),
-            value: option,
-            groupValue: filter.sortBy,
-            onChanged: (value) {
-              if (value != null) {
-                ref.read(libraryFilterProvider.notifier).state =
-                    filter.copyWith(sortBy: value);
-              }
-            },
-          );
-        }),
+        RadioGroup<SortOption>(
+          groupValue: filter.sortBy,
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(libraryFilterProvider.notifier).state =
+                  filter.copyWith(sortBy: value);
+            }
+          },
+          child: Column(
+            children: SortOption.values.map((option) {
+              return RadioListTile<SortOption>(
+                title: Text(_getSortOptionLabel(option)),
+                value: option,
+              );
+            }).toList(),
+          ),
+        ),
         const Divider(),
         SwitchListTile(
           title: const Text('Sort Ascending'),

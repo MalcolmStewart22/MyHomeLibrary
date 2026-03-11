@@ -55,7 +55,12 @@ class SearchResultRow extends StatelessWidget {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => BookDetailsModal(book: book),
+            builder: (context) => Builder(
+              builder: (context) => Padding(
+                padding: MediaQuery.of(context).viewInsets,
+                child: BookDetailsModal(book: book),
+              ),
+            ),
           );
         },
         trailing: ElevatedButton.icon(

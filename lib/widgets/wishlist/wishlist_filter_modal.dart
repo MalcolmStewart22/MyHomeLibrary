@@ -160,19 +160,23 @@ class _WishlistFilterModalState extends ConsumerState<WishlistFilterModal> {
   Widget _buildSortOptions(WishlistFilter filter) {
     return Column(
       children: [
-        ...WishlistSortOption.values.map((option) {
-          return RadioListTile<WishlistSortOption>(
-            title: Text(_getSortOptionLabel(option)),
-            value: option,
-            groupValue: filter.sortBy,
-            onChanged: (value) {
-              if (value != null) {
-                ref.read(wishlistFilterProvider.notifier).state =
-                    filter.copyWith(sortBy: value);
-              }
-            },
-          );
-        }),
+        RadioGroup<WishlistSortOption>(
+          groupValue: filter.sortBy,
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(wishlistFilterProvider.notifier).state =
+                  filter.copyWith(sortBy: value);
+            }
+          },
+          child: Column(
+            children: WishlistSortOption.values.map((option) {
+              return RadioListTile<WishlistSortOption>(
+                title: Text(_getSortOptionLabel(option)),
+                value: option,
+              );
+            }).toList(),
+          ),
+        ),
         const Divider(),
         SwitchListTile(
           title: const Text('Sort Ascending'),

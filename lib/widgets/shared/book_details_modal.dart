@@ -23,6 +23,7 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
   late int? _rating;
   late TextEditingController _notesController;
   late TextEditingController _seriesController;
+  
 
   @override
   void initState() {
@@ -43,7 +44,7 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
   @override
   Widget build(BuildContext context) {
     final isFromLibrary = widget.book.isInLibrary;
-    
+
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       minChildSize: 0.5,
@@ -84,42 +85,45 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                         ),
                       ),
                     ),
-                    
                     Text(
                       widget.book.title,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      style:
+                          Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 8),
-
                     if (widget.book.author != null) ...[
                       Text(
                         widget.book.author!,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.grey[600],
+                                ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 24),
                     ],
-
                     const Divider(),
-
                     if (!isFromLibrary) ...[
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             if (widget.book.id != null) {
-                              final booksNotifier = ref.read(booksNotifierProvider.notifier);
-                              await booksNotifier.moveBookToLibrary(widget.book);
+                              final navigator = Navigator.of(context);
+                              final messenger = ScaffoldMessenger.of(context);
+                              final booksNotifier =
+                                  ref.read(booksNotifierProvider.notifier);
+                              await booksNotifier
+                                  .moveBookToLibrary(widget.book);
                               if (mounted) {
                                 ref.invalidate(libraryBooksProvider);
                                 ref.invalidate(wishlistBooksProvider);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                navigator.pop();
+
+                                messenger.showSnackBar(
                                   const SnackBar(
                                     content: Text('Book moved to Library'),
                                     duration: Duration(seconds: 2),
@@ -139,7 +143,6 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                       const Divider(),
                       const SizedBox(height: 16),
                     ],
-
                     if (isFromLibrary) ...[
                       _buildReadStatusSection(context),
                       const SizedBox(height: 16),
@@ -147,8 +150,11 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                       const SizedBox(height: 16),
                       const Divider(),
                       const SizedBox(height: 16),
+                      _buildSeriesSection(context),
+                      const SizedBox(height: 24),
+                      const Divider(),
+                      const SizedBox(height: 16),
                     ],
-
                     DetailRow(
                       label: 'Published Date',
                       value: widget.book.publishedDate ?? 'N/A',
@@ -188,16 +194,16 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                         label: 'Genre',
                         value: widget.book.genre!,
                       ),
-
                     if (widget.book.description != null) ...[
                       const SizedBox(height: 16),
                       const Divider(),
                       const SizedBox(height: 16),
                       Text(
                         'Description',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -205,16 +211,10 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
-
                     const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    _buildSeriesSection(context),
-                    const SizedBox(height: 24),
                     const Divider(),
                     const SizedBox(height: 16),
                     _buildNotesSection(context),
-                    
                     const SizedBox(height: 24),
                     const Divider(),
                     const SizedBox(height: 16),
@@ -318,14 +318,19 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
       final updatedBook = widget.book.copyWith(
         isRead: _isRead,
         rating: _rating,
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-        series: _seriesController.text.trim().isEmpty ? null : _seriesController.text.trim(),
+        notes: _notesController.text.trim().isEmpty
+            ? null
+            : _notesController.text.trim(),
+        series: _seriesController.text.trim().isEmpty
+            ? null
+            : _seriesController.text.trim(),
       );
       await databaseService.updateBook(updatedBook);
-      
+
       ref.invalidate(libraryBooksProvider);
       ref.invalidate(wishlistBooksProvider);
-      
+      ref.invalidate(allSeriesNamesProvider);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -339,7 +344,7 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
 
   Widget _buildSeriesSection(BuildContext context) {
     final seriesNamesAsync = ref.watch(allSeriesNamesProvider);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -358,9 +363,11 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                 if (textEditingValue.text.isEmpty) {
                   return seriesNames;
                 }
-                return seriesNames.where((series) =>
-                  series.toLowerCase().contains(textEditingValue.text.toLowerCase())
-                ).toList();
+                return seriesNames
+                    .where((series) => series
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase()))
+                    .toList();
               },
               onSelected: (String value) {
                 _seriesController.text = value;
@@ -378,13 +385,13 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                     textEditingController.text = _seriesController.text;
                   }
                 });
-                
+
                 return TextField(
                   controller: textEditingController,
                   focusNode: focusNode,
                   decoration: InputDecoration(
                     hintText: 'Enter series name (e.g., "Harry Potter")',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     contentPadding: const EdgeInsets.all(12),
                     suffixIcon: seriesNames.isNotEmpty
                         ? Icon(Icons.arrow_drop_down, color: Colors.grey[600])
@@ -413,7 +420,7 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
                 if (options.isEmpty) {
                   return const SizedBox.shrink();
                 }
-                
+
                 return Align(
                   alignment: Alignment.topLeft,
                   child: Material(
@@ -444,10 +451,10 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
           },
           loading: () => TextField(
             controller: _seriesController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter series name (e.g., "Harry Potter")',
               border: OutlineInputBorder(),
-              contentPadding: const EdgeInsets.all(12),
+              contentPadding: EdgeInsets.all(12),
             ),
             onEditingComplete: () {
               FocusScope.of(context).unfocus();
@@ -460,10 +467,10 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
           ),
           error: (error, stack) => TextField(
             controller: _seriesController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter series name (e.g., "Harry Potter")',
               border: OutlineInputBorder(),
-              contentPadding: const EdgeInsets.all(12),
+              contentPadding: EdgeInsets.all(12),
             ),
             onEditingComplete: () {
               FocusScope.of(context).unfocus();
@@ -493,10 +500,10 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
         TextField(
           controller: _notesController,
           maxLines: 5,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             hintText: 'Add your personal notes about this book...',
             border: OutlineInputBorder(),
-            contentPadding: const EdgeInsets.all(12),
+            contentPadding: EdgeInsets.all(12),
           ),
           onEditingComplete: () {
             FocusScope.of(context).unfocus();
@@ -513,13 +520,16 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
 
   Widget _buildDeleteButton(BuildContext context) {
     final isFromLibrary = widget.book.isInLibrary;
-    
+
     return OutlinedButton.icon(
       onPressed: () async {
+        final navigator = Navigator.of(context);
+        final messenger = ScaffoldMessenger.of(context);
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Delete ${isFromLibrary ? "from Library" : "from Wishlist"}?'),
+            title: Text(
+                'Delete ${isFromLibrary ? "from Library" : "from Wishlist"}?'),
             content: Text(
               'Are you sure you want to remove "${widget.book.title}" ${isFromLibrary ? "from your library" : "from your wishlist"}? This action cannot be undone.',
             ),
@@ -540,14 +550,15 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
         if (confirmed == true && widget.book.id != null) {
           final booksNotifier = ref.read(booksNotifierProvider.notifier);
           await booksNotifier.deleteBook(widget.book.id!);
-          
+
           if (mounted) {
             ref.invalidate(libraryBooksProvider);
             ref.invalidate(wishlistBooksProvider);
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
+            navigator.pop();
+            messenger.showSnackBar(
               SnackBar(
-                content: Text('Book removed ${isFromLibrary ? "from library" : "from wishlist"}'),
+                content: Text(
+                    'Book removed ${isFromLibrary ? "from library" : "from wishlist"}'),
                 duration: const Duration(seconds: 2),
               ),
             );
@@ -566,6 +577,4 @@ class _BookDetailsModalState extends ConsumerState<BookDetailsModal> {
       ),
     );
   }
-
 }
-

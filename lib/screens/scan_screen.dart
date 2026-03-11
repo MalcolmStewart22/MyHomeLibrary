@@ -134,19 +134,19 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
         appBar: AppBar(
           title: const Text('Scan'),
         ),
-        body: Center(
+        body: const Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.qr_code_scanner, size: 64, color: Colors.grey),
-              const SizedBox(height: 16),
-              const Text(
+              Icon(Icons.qr_code_scanner, size: 64, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
                 'Barcode scanning is only available on mobile devices',
                 style: TextStyle(fontSize: 16),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: 8),
+              Text(
                 'Please use the Search screen to find books by title or author',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
@@ -323,7 +323,7 @@ class _ScanOverlayPainter extends CustomPainter {
       framePaint,
     );
 
-    final cornerLength = 30.0;
+    const cornerLength = 30.0;
     final cornerPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke

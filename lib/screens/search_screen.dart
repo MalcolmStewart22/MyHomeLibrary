@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/search_provider.dart';
@@ -14,7 +13,6 @@ class SearchScreen extends ConsumerStatefulWidget {
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  Timer? _debounce;
   bool _isSearchFocused = false;
 
   @override
@@ -29,21 +27,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   @override
   void dispose() {
-    _debounce?.cancel();
     _searchController.dispose();
     _searchFocusNode.dispose();
     super.dispose();
   }
 
-  void _onSearchChanged(String value) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      ref.read(searchQueryProvider.notifier).state = value;
-    });
-  }
-
   Future<void> _performSearch(String query) async {
-    _debounce?.cancel();
     if (query.trim().isNotEmpty) {
       final trimmedQuery = query.trim();
       ref.read(searchQueryProvider.notifier).state = trimmedQuery;
@@ -87,13 +76,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   vertical: 12,
                 ),
               ),
-              onChanged: _onSearchChanged,
               onSubmitted: (value) {
                 _performSearch(value);
               },
             ),
           ),
-          if (_isSearchFocused && searchQuery.isEmpty) 
+          if (_isSearchFocused && searchQuery.isEmpty)
             _buildRecentSearches(),
           Expanded(
             child: searchQuery.isEmpty && !_isSearchFocused
@@ -174,15 +162,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           ),
                     ),
                     TextButton(
-                      onPressed: () {
-                        ref.read(searchHistoryProvider.notifier).clearHistory();
-                      },
-                      child: const Text('Clear'),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
+                      onPressed: () {
+                        ref.read(searchHistoryProvider.notifier).clearHistory();
+                      },
+                      child: const Text('Clear'),
                     ),
                   ],
                 ),

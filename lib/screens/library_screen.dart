@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/library_filter.dart' show LibraryFilter, ReadStatus, SortOption, ViewMode, GroupBy;
+import '../models/library_filter.dart' show ReadStatus, SortOption, ViewMode, GroupBy;
 import '../models/series_group.dart';
 import '../providers/library_provider.dart';
 import '../providers/books_provider.dart';

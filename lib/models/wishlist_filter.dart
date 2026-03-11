@@ -6,6 +6,8 @@ enum WishlistSortOption {
   genre,
 }
 
+const _undefined = Object();
+
 class WishlistFilter {
   final String? genre;
   final String? searchQuery;
@@ -20,14 +22,14 @@ class WishlistFilter {
   });
 
   WishlistFilter copyWith({
-    String? genre,
-    String? searchQuery,
+    Object? genre = _undefined,
+    Object? searchQuery = _undefined,
     WishlistSortOption? sortBy,
     bool? sortAscending,
   }) {
     return WishlistFilter(
-      genre: genre ?? this.genre,
-      searchQuery: searchQuery ?? this.searchQuery,
+      genre: genre == _undefined ? this.genre : genre as String?,
+      searchQuery: searchQuery == _undefined ? this.searchQuery : searchQuery as String?,
       sortBy: sortBy ?? this.sortBy,
       sortAscending: sortAscending ?? this.sortAscending,
     );

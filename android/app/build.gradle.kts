@@ -37,6 +37,13 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    packaging {
+        jniLibs {
+            // Required for 16KB page size alignment on Android 15+
+            useLegacyPackaging = false
+        }
+    }
 }
 
 flutter {

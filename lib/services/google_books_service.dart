@@ -25,9 +25,10 @@ class GoogleBooksService {
           String? isbn;
           final identifiers = volumeInfo['industryIdentifiers'] as List?;
           if (identifiers != null) {
-            for (var id in identifiers) {
-              final type = (id as Map<String, dynamic>)['type'] as String?;
-              final identifier = (id as Map<String, dynamic>)['identifier'] as String?;
+            for (final id in identifiers) {
+              final idMap = id as Map<String, dynamic>;
+              final type = idMap['type'] as String?;
+              final identifier = idMap['identifier'] as String?;
               if (type == 'ISBN_13' && identifier != null) {
                 isbn = identifier;
                 break;

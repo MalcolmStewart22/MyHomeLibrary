@@ -12,6 +12,8 @@ enum ViewMode { grid, list }
 
 enum GroupBy { none, series, author }
 
+const _undefined = Object();
+
 class LibraryFilter {
   final ReadStatus readStatus;
   final int? minRating;
@@ -35,20 +37,20 @@ class LibraryFilter {
 
   LibraryFilter copyWith({
     ReadStatus? readStatus,
-    int? minRating,
-    String? genre,
-    String? searchQuery,
-    String? series,
+    Object? minRating = _undefined,
+    Object? genre = _undefined,
+    Object? searchQuery = _undefined,
+    Object? series = _undefined,
     GroupBy? groupBy,
     SortOption? sortBy,
     bool? sortAscending,
   }) {
     return LibraryFilter(
       readStatus: readStatus ?? this.readStatus,
-      minRating: minRating ?? this.minRating,
-      genre: genre ?? this.genre,
-      searchQuery: searchQuery ?? this.searchQuery,
-      series: series ?? this.series,
+      minRating: minRating == _undefined ? this.minRating : minRating as int?,
+      genre: genre == _undefined ? this.genre : genre as String?,
+      searchQuery: searchQuery == _undefined ? this.searchQuery : searchQuery as String?,
+      series: series == _undefined ? this.series : series as String?,
       groupBy: groupBy ?? this.groupBy,
       sortBy: sortBy ?? this.sortBy,
       sortAscending: sortAscending ?? this.sortAscending,

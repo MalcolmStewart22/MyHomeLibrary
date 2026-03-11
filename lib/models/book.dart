@@ -99,6 +99,8 @@ class Book {
     );
   }
 
+  static const _undefined = Object();
+
   Book copyWith({
     int? id,
     String? title,
@@ -113,14 +115,14 @@ class Book {
     DateTime? dateAdded,
     bool? isInLibrary,
     bool? isRead,
-    int? rating,
-    int? priority,
+    Object? rating = _undefined,
+    Object? priority = _undefined,
     String? version,
     String? edition,
     String? language,
     String? previewLink,
-    String? notes,
-    String? series,
+    Object? notes = _undefined,
+    Object? series = _undefined,
   }) {
     return Book(
       id: id ?? this.id,
@@ -136,14 +138,14 @@ class Book {
       dateAdded: dateAdded ?? this.dateAdded,
       isInLibrary: isInLibrary ?? this.isInLibrary,
       isRead: isRead ?? this.isRead,
-      rating: rating ?? this.rating,
-      priority: priority ?? this.priority,
+      rating: rating == _undefined ? this.rating : rating as int?,
+      priority: priority == _undefined ? this.priority : priority as int?,
       version: version ?? this.version,
       edition: edition ?? this.edition,
       language: language ?? this.language,
       previewLink: previewLink ?? this.previewLink,
-      notes: notes ?? this.notes,
-      series: series ?? this.series,
+      notes: notes == _undefined ? this.notes : notes as String?,
+      series: series == _undefined ? this.series : series as String?,
     );
   }
 }
